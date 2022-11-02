@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.github.davidmoten</groupId>
+        <artifactId>sonatype-parent</artifactId>
+        <version>0.1</version>
+    </parent>
+    <artifactId>gc-load-tester</artifactId>
+    <version>0.1.2-SNAPSHOT</version>
+    <name>${project.artifactId}</name>
+    <description>Tries to provoke an apparent g1 gc bug in OpenJDK 1.8u322+</description>
+    <packaging>jar</packaging>
+
+    <url>http://github.com/davidmoten/gc-load-tester</url>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <exec.version>3.1.0</exec.version>
+        <jmh.version>1.35</jmh.version>
+        <slf4j.version>2.0.3</slf4j.version>
+
+        <checkstyle.version>3.2.0</checkstyle.version>
+        <javadoc.version>3.4.1</javadoc.version>
+        <spotbugs.version>4.7.2.1</spotbugs.version>
+        <pmd.version>3.19.0</pmd.version>
+        <project.info.version>3.4.1</project.info.version>
+        <jxr.version>3.3.0</jxr.version>
+        <taglist.version>3.0.0</taglist.version>
+        <m3.site.version>3.12.1</m3.site.version>
+        <heap>1000m</heap>
+    </properties>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>A business-friendly OSS license</comments>
+        </license>
+    </licenses>
+
+    <ciManagement>
+        <system>GithubActions</system>
+        <url>https://github.com/davidmoten/gc-load-tester/actions/workflows/ci.yml</url>
+    </ciManagement>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/davidmoten/gc-load-tester/issues</url>
+    </issueManagement>
+
+    <inceptionYear>2022</inceptionYear>
+    <developers>
+        <developer>
+            <id>dave</id>
+            <name>Dave Moten</name>
+            <url>https://github.com/davidmoten/</url>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+            <timezone>+10</timezone>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/davidmoten/gc-load-tester.git</connection>
+        <developerConnection>scm:git:https://github.com/davidmoten/gc-load-tester.git</developerConnection>
+        <url>scm:git:https://github.com:davidmoten/gc-load-tester.git</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <!-- Test Dependencies -->
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.8</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>com/github/davidmoten/gc-load-tester/internal/queue/*</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M7</version>
+                <!-- need ${argLine} to include jacoco args --> 
+                <configuration>
+                    <argLine>${argLine} -Xmx${heap}</argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
